@@ -66,8 +66,8 @@ namespace Shop.API.Controllers
                 resource._actions = new
                 {
                     addProductInSale = new
-                    {
-                        href = $"/api/products/getproductsbysaleid/{saleId}"
+                    {asdf
+                        href = $"/api/products/addproductinsale/{saleId}"
                     }
                 };
                 return Ok(product);
