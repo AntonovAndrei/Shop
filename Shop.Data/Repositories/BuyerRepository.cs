@@ -1,4 +1,5 @@
-﻿using Shop.Core.Entities;
+﻿using Microsoft.Extensions.Logging;
+using Shop.Core.Entities;
 using Shop.Data.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -10,29 +11,66 @@ namespace Shop.Data.Repositories
 {
     public class BuyerRepository : IBuyerRepository
     {
-        public Task AddAsync(Buyer buyer)
+        private readonly ShopContext _context;
+        private readonly ILogger<BuyerRepository> _logger;
+
+        public BuyerRepository(ShopContext context, ILogger<BuyerRepository> logger)
         {
-            throw new NotImplementedException();
+            _logger = logger;
+            _context = context;
         }
 
-        public Task DeleteAsync(int id)
+
+        public async Task AddAsync(Buyer buyer)
         {
-            throw new NotImplementedException();
+            await _context.AddAsync(buyer);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var buyer = await _context.Buyers.FindAsync(id);
+
+            if (buyer == null)
+            {
+                _logger.LogInformation($"No buyer with {id} id");
+                throw new Exception("An buyer with this id was not found");
+            }
+
+            _context.Remove(buyer);
+            await _context.SaveChangesAsync();
         }
 
         public IList<Buyer> GetAll()
         {
-            throw new NotImplementedException();
+            return _context.Buyers.ToList();
         }
 
         public Buyer GetById(int id)
         {
-            throw new NotImplementedException();
+            var buyer = _context.Buyers.FirstOrDefault(e => e.Id == id);
+
+            if (buyer == null)
+            {
+                _logger.LogInformation($"No buyer with {id} id");
+                throw new Exception("An buyer with this id was not found");
+            }
+
+            return buyer;
         }
 
-        public Task UpdateAsync(Buyer buyer)
+        public async Task UpdateAsync(Buyer buyer)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.Buyers.Update(buyer);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
     }
 }

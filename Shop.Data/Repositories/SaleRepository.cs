@@ -35,7 +35,7 @@ namespace Shop.Data.Repositories
             if(sale == null)
             {
                 _logger.LogInformation($"No sale with {id} id");
-                throw new Exception("An entity with this id was not found");
+                throw new Exception("An sale with this id was not found");
             }
 
             _context.Remove(sale);
@@ -44,17 +44,17 @@ namespace Shop.Data.Repositories
 
         public IList<Sale> GetAll()
         {
-            return _context.Sales.ToList();
+            return _context.Sales.Include(e => e.Buyer).ToList();
         }
 
         public Sale GetById(int id)
         {
-            var sale = _context.Sales.FirstOrDefault(e => e.Id == id);
+            var sale = _context.Sales.Include(e => e.Buyer).FirstOrDefault(e => e.Id == id);
 
             if (sale == null)
             {
                 _logger.LogInformation($"No sale with {id} id");
-                throw new Exception("An entity with this id was not found");
+                throw new Exception("An sale with this id was not found");
             }
 
             return sale; 
