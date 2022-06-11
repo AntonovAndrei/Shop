@@ -59,6 +59,21 @@ namespace Shop.Data.Repositories
             return product;
         }
 
+        public IList<Product> GetProductBySaleId(int saleId)
+        {
+            var sales = _context.Sales.Where(e => e.Id == saleId)
+                .Include(e => e.Products)
+                .Select(e => e.Products.ToList()).FirstOrDefault();
+
+            if (sales == null)
+            {
+                _logger.LogInformation($"No products with {saleId} productId");
+                throw new Exception("An products with this productId was not found");
+            }
+
+            return sales;
+        }
+
         public async Task UpdateAsync(Product product)
         {
             try

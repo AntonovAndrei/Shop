@@ -34,12 +34,6 @@ namespace Shop.API.Controllers
                 var resource = product.ToResource();
                 resource._actions = new
                 {
-                    create = new
-                    {
-                        href = $"/api/products/{id}",
-                        method = "POST",
-                        name = $"Create product with {id} id"
-                    },
                     update = new
                     {
                         href = $"/api/products/{id}",
@@ -59,6 +53,30 @@ namespace Shop.API.Controllers
             {
                 return NotFound(ex.Message);
             }
+        }
+
+        [HttpGet("getproductsbysaleid/{saleId}")]
+        [Produces("application/hal+json")]
+        public IActionResult GetProductsBySaleId(int saleId)
+        {
+            try
+            {
+                var product = _productRepositry.GetProductBySaleId(saleId);
+                var resource = product.ToResource(saleId);
+                resource._actions = new
+                {
+                    addProductInSale = new
+                    {
+                        href = $"/api/products/getproductsbysaleid/{saleId}"
+                    }
+                };
+                return Ok(product);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+
         }
     }
 }

@@ -62,6 +62,23 @@ namespace Shop.API.HAL
             return resource;
         }
 
+        public static dynamic ToResource(this IList<Product> product, int saleId)
+        {
+            var resource = product.ToDynamic();
+            resource._links = new
+            {
+                self = new
+                {
+                    href = $"/api/products/getproductsbysaleid/{saleId}"
+                },
+                sale = new
+                {
+                    href = $"/api/sales/{saleId}"
+                }
+            };
+            return resource;
+        }
+
         public static dynamic ToDynamic(this object value)
         {
             IDictionary<string, object> result = new ExpandoObject();
