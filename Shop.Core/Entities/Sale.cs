@@ -20,7 +20,7 @@ namespace Shop.Core.Entities
         public int TotalAmount { get; set; }
         public int BuyerId { get; set; }
 
-
+        [JsonIgnore]
         public virtual Buyer Buyer { get; set; }
         [JsonIgnore]
         public virtual ICollection<Product> Products { get; set; }

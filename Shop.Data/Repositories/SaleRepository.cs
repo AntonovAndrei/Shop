@@ -21,6 +21,20 @@ namespace Shop.Data.Repositories
             _context = context;
         }
 
+        public IList<Sale> GetByProductId(int productId)
+        {
+            var sales = _context.Products.Where(e => e.Id == productId)
+                .Include(e => e.Sales)
+                .Select(e => e.Sales.ToList()).FirstOrDefault();
+
+            if (sales == null)
+            {
+                _logger.LogInformation($"No sales with {productId} productId");
+                throw new Exception("An sales with this productId was not found");
+            }
+
+            return sales;
+        }
 
         public async Task AddAsync(Sale sale)
         {

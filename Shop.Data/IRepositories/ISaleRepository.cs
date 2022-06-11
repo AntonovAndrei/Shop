@@ -14,5 +14,6 @@ namespace Shop.Data.IRepositories
         Task DeleteAsync(int id);
         IList<Sale> GetAll();
         Sale GetById(int id);
+        IList<Sale> GetByProductId(int productId);
     }
 }

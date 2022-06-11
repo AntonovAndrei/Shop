@@ -35,6 +35,21 @@ namespace Shop.API.Controllers
             }
         }
 
+        [HttpGet("getsalesbyproductid/{productId}")]
+        public IActionResult GetSalesByProductId(int productId)
+        {
+            try
+            {
+                var sale = _saleRepositry.GetByProductId(productId);
+                return Ok(sale);
+            }
+            catch(Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+
+        }
+
         [HttpGet]
         public IActionResult GetAll()
         {
