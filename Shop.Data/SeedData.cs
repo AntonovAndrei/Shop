@@ -32,21 +32,21 @@ namespace Shop.Data
                 var sales = new List<Sale>() { new Sale { Id = 1, BuyerId = 1, Buyer = buyers[0], TotalAmount = 485, DateTime = DateTime.Now},
                     new Sale { Id = 2, BuyerId = 2, Buyer = buyers[1], TotalAmount = 185, DateTime = DateTime.Now } };
 
-                buyers[0].Sales = new HashSet<Sale>() { sales[0] };
-                buyers[1].Sales = new HashSet<Sale>() { sales[1] };
+                /*buyers[0].Sales = new HashSet<Sale>() { sales[0] };
+                buyers[1].Sales = new HashSet<Sale>() { sales[1] };*/
 
 
 
                 var products = new List<Product>() { new Product { Id = 1, Name = "Meat", Price = 300 }, new Product { Id = 2, Name = "Eggs", Price = 100 }, 
                         new Product { Id = 3, Name = "Milk", Price = 50 }, new Product { Id = 4, Name = "Bread", Price = 35 } };
 
-                products[0].Sales = new HashSet<Sale>() { sales[0] };
+                /*products[0].Sales = new HashSet<Sale>() { sales[0] };
                 products[1].Sales = new HashSet<Sale>() { sales[0], sales[1] };
                 products[2].Sales = new HashSet<Sale>() { sales[0], sales[1] };
-                products[3].Sales = new HashSet<Sale>() { sales[0], sales[1] };
+                products[3].Sales = new HashSet<Sale>() { sales[0], sales[1] };*/
 
-                sales[0].Products = new HashSet<Product>() { products[0], products[1], products[2], products[3]};
-                sales[1].Products = new HashSet<Product>() { products[1], products[2], products[3] };
+                /*sales[0].Products = new HashSet<Product>() { products[0], products[1], products[2], products[3]};
+                sales[1].Products = new HashSet<Product>() { products[1], products[2], products[3] };*/
 
                 await context.Buyers.AddRangeAsync(buyers);
                 await context.Sales.AddRangeAsync(sales);
