@@ -2,11 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Shop.Core.Entities;
 using Shop.Data.IRepositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shop.Data.Repositories
 {
@@ -58,7 +53,7 @@ namespace Shop.Data.Repositories
             if (product == null)
             {
                 _logger.LogInformation($"No product with {id} id");
-                throw new Exception("An product with this id was not found");
+                return null;
             }
 
             return product;
@@ -79,12 +74,12 @@ namespace Shop.Data.Repositories
             return sales;
         }
 
-        public async Task UpdateAsync(Product product)
+        public void Update(Product product)
         {
             try
             {
                 _context.Products.Update(product);
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             catch (Exception ex)
             {

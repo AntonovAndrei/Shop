@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shop.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shop.Data
 {
@@ -27,6 +22,5 @@ namespace Shop.Data
 
             base.OnModelCreating(modelBuilder);
         }
-
     }
 }

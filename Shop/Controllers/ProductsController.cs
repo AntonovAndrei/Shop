@@ -3,11 +3,6 @@ using Shop.API.HAL;
 using Shop.API.Models;
 using Shop.Core.Entities;
 using Shop.Data.IRepositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shop.API.Controllers
 {
@@ -17,14 +12,13 @@ namespace Shop.API.Controllers
     {
         private readonly IProductRepository _productRepositry;
         private readonly ILogger<ProductsController> _logger;
+        const int PAGE_SIZE = 25;
 
         public ProductsController(IProductRepository productRepositry, ILogger<ProductsController> logger)
         {
             _productRepositry = productRepositry;
             _logger = logger;
         }
-
-        const int PAGE_SIZE = 25;
 
         [HttpGet("{id}")]
         [Produces("application/hal+json")]
@@ -33,6 +27,7 @@ namespace Shop.API.Controllers
             try
             {
                 var product = _productRepositry.GetById(id);
+                if (product == null) return NotFound();
                 var resource = product.ToResource();
                 resource._actions = new
                 {
@@ -107,12 +102,13 @@ namespace Shop.API.Controllers
         {
             var product = new Product
             {
+                Id = dto.Id,
                 Name = dto.Name,
                 Price = dto.Price,
             };
             try
             {
-                _productRepositry.UpdateAsync(product);
+                _productRepositry.Update(product);
                 return Ok(dto);
             }
             catch (Exception ex)
@@ -125,28 +121,26 @@ namespace Shop.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ProductDto dto)
         {
-            var existing = _productRepositry.GetById(dto.Id);
-            if (existing != null)
-                return Conflict($"Sorry, there is already a product with registration {dto.Id} in the database.");
+                var existing = _productRepositry.GetById(dto.Id);
+                if (existing != default)
+                    return Conflict($"Sorry, there is already a product with id {dto.Id} in the database.");
+                var product = new Product
+                {
+                    Id = dto.Id,
+                    Name = dto.Name,
+                    Price = dto.Price,
+                };
+                try
+                {
+                    await _productRepositry.AddAsync(product);
+                    return Created($"/api/products/{product.Id}", product.ToResource());
+                }
+                catch (Exception ex)
+                {
+                    return Problem(ex.Message);
+                }
 
-
-            var product = new Product
-            {
-                Id = dto.Id,
-                Name = dto.Name,
-                Price = dto.Price,
-            };
-            try
-            {
-                убрать из дто id 
-                await _productRepositry.AddAsync(product);
-                return Created($"/api/products/{product.Id}", product.ToResource());
-            }
-            catch (Exception ex)
-            {
-                return Problem(ex.Message);
-            }
-            
+            return Problem();
         }
 
 

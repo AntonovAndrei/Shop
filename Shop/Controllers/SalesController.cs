@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Shop.API.HAL;
 using Shop.Data.IRepositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shop.API.Controllers
 {
@@ -14,6 +10,7 @@ namespace Shop.API.Controllers
     {
         private readonly ISaleRepository _saleRepositry;
         private readonly ILogger<SalesController> _logger;
+        const int PAGE_SIZE = 25;
 
         public SalesController(ISaleRepository saleRepositry, ILogger<SalesController> logger)
         {
@@ -51,11 +48,22 @@ namespace Shop.API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        [Produces("application/hal+json")]
+        public IActionResult Get(int index = 0, int count = PAGE_SIZE)
         {
-            var sale = _saleRepositry.GetAll();
-            if (sale == null) return NotFound();
-            return Ok(sale);
+            var products = _saleRepositry.GetAll().Skip(index).Take(count)
+                .Select(v => v.ToResource());
+            var total = _saleRepositry.Count();
+            var _links = SaleHAL.PaginateAsDynamic("/api/sales", index, count, total);
+            var result = new
+            {
+                _links,
+                count,
+                total,
+                index,
+                products
+            };
+            return Ok(result);
         }
     }
 }

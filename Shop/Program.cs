@@ -1,5 +1,9 @@
+using GraphQL.SystemTextJson;
+using GraphQL.Server;
+using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Shop.API.GraphQL.Schemas;
 using Shop.Data;
 using Shop.Data.IRepositories;
 using Shop.Data.Repositories;
@@ -11,13 +15,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ShopContext>(
     db => db.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-/*builder.Services.AddDbContext<ShopContext>(opt => opt.UseInMemoryDatabase(databaseName: "Shop"));*/
 builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IBuyerRepository, BuyerRepository>();
 
-builder.Services.AddControllers()/*.AddJsonOptions(x =>
-                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve)*/;
+builder.Services.AddScoped<ISchema, AutoSchema>();
+builder.Services.AddGraphQL(options => { options.EnableMetrics = true; }).AddSystemTextJson();
+
+builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
@@ -48,11 +53,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseGraphQLAltair();
 }
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseGraphQL<ISchema>();
 
 app.MapControllers();
 

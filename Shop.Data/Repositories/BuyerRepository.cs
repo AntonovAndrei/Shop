@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Shop.Core.Entities;
 using Shop.Data.IRepositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shop.Data.Repositories
 {
@@ -58,7 +53,7 @@ namespace Shop.Data.Repositories
             if (buyer == null)
             {
                 _logger.LogInformation($"No buyer with {id} id");
-                throw new Exception("An buyer with this id was not found");
+                return null;
             }
 
             return buyer;
