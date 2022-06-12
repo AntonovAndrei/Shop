@@ -27,6 +27,11 @@ namespace Shop.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public int Count()
+        {
+            return _context.Buyers.Count();
+        }
+
         public async Task DeleteAsync(int id)
         {
             var buyer = await _context.Buyers.FindAsync(id);

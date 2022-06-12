@@ -21,6 +21,11 @@ namespace Shop.Data.Repositories
             _context = context;
         }
 
+        public int Count()
+        {
+            return _context.Sales.Count();
+        }
+
         public IList<Sale> GetByProductId(int productId)
         {
             var sales = _context.Products.Where(e => e.Id == productId)

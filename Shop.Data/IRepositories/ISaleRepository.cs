@@ -15,5 +15,6 @@ namespace Shop.Data.IRepositories
         IList<Sale> GetAll();
         Sale GetById(int id);
         IList<Sale> GetByProductId(int productId);
+        int Count();
     }
 }

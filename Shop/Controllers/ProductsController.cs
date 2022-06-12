@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shop.API.HAL;
+using Shop.API.Models;
+using Shop.Core.Entities;
 using Shop.Data.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -57,24 +59,109 @@ namespace Shop.API.Controllers
 
         [HttpGet("getproductsbysaleid/{saleId}")]
         [Produces("application/hal+json")]
-        public IActionResult GetProductsBySaleId(int saleId)
+        public IActionResult GetProductsBySaleId(int saleId, int index = 0, int count = PAGE_SIZE)
         {
             try
             {
-                var product = _productRepositry.GetProductBySaleId(saleId);
-                var resource = product.ToResource(saleId);
-                resource._actions = new
+                var products = _productRepositry.GetProductBySaleId(saleId).Skip(index).Take(count)
+                    .Select(v => v.ToResource());
+                var total = _productRepositry.Count();
+                var _links = ProductHAL.PaginateAsDynamic("/api/products", index, count, total);
+                var result = new
                 {
-                    addProductInSale = new
-                    {asdf
-                        href = $"/api/products/addproductinsale/{saleId}"
-                    }
+                    _links,
+                    count,
+                    total,
+                    index,
+                    products
                 };
-                return Ok(product);
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Produces("application/hal+json")]
+        public IActionResult Get(int index = 0, int count = PAGE_SIZE)
+        {
+            var products = _productRepositry.GetAll().Skip(index).Take(count)
+                .Select(v => v.ToResource());
+            var total = _productRepositry.Count();
+            var _links = ProductHAL.PaginateAsDynamic("/api/products", index, count, total);
+            var result = new
+            {
+                _links,
+                count,
+                total,
+                index,
+                products
+            };
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public IActionResult Put([FromBody] ProductDto dto)
+        {
+            var product = new Product
+            {
+                Name = dto.Name,
+                Price = dto.Price,
+            };
+            try
+            {
+                _productRepositry.UpdateAsync(product);
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] ProductDto dto)
+        {
+            var existing = _productRepositry.GetById(dto.Id);
+            if (existing != null)
+                return Conflict($"Sorry, there is already a product with registration {dto.Id} in the database.");
+
+
+            var product = new Product
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                Price = dto.Price,
+            };
+            try
+            {
+                убрать из дто id 
+                await _productRepositry.AddAsync(product);
+                return Created($"/api/products/{product.Id}", product.ToResource());
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+            
+        }
+
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                var product = _productRepositry.GetById(id);
+                _productRepositry.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
             }
 
         }

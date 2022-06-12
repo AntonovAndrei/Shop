@@ -9,11 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddDbContext<ShopContext>(opt => opt.UseInMemoryDatabase(databaseName: "Shop"));
+builder.Services.AddDbContext<ShopContext>(
+    db => db.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+/*builder.Services.AddDbContext<ShopContext>(opt => opt.UseInMemoryDatabase(databaseName: "Shop"));*/
 builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IBuyerRepository, BuyerRepository>();
-//potom ubrat
+
 builder.Services.AddControllers()/*.AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve)*/;
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -38,6 +40,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 SeedDatabase();
 
 // Configure the HTTP request pipeline.

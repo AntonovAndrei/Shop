@@ -21,6 +21,11 @@ namespace Shop.Data.Repositories
             _context = context;
         }
 
+        public int Count()
+        {
+            return _context.Products.Count();
+        }
+
         public async Task AddAsync(Product product)
         {
             await _context.AddAsync(product);
@@ -37,7 +42,7 @@ namespace Shop.Data.Repositories
                 throw new Exception("An product with this id was not found");
             }
 
-            _context.Remove(product);
+            _context.Products.Remove(product);
             await _context.SaveChangesAsync();
         }
 
